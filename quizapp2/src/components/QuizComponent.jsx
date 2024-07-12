@@ -1,83 +1,73 @@
 import React, { Component } from 'react';
-import questions from '../resources/quizQuestion.json';
+import quizData from '../resources/quizData.json';
 
-class Quiz extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      currentQuestionIndex: 0,
-    };
-  }
+class QuizComponent extends Component {
+  state = {
+    activeQuestionIndex: 0,
+  };
 
-  handlePreviousQuestion = () => {
-    this.setState((prevState) => ({
-      currentQuestionIndex:
-        prevState.currentQuestionIndex === 0
-          ? questions.length - 1
-          : prevState.currentQuestionIndex - 1,
+  navigateToPreviousQuestion = () => {
+    this.setState(prevState => ({
+      activeQuestionIndex:
+        prevState.activeQuestionIndex === 0
+          ? quizData.length - 1
+          : prevState.activeQuestionIndex - 1,
     }));
   };
 
-  handleNextQuestion = () => {
-    this.setState((prevState) => ({
-      currentQuestionIndex:
-        prevState.currentQuestionIndex === questions.length - 1
+  navigateToNextQuestion = () => {
+    this.setState(prevState => ({
+      activeQuestionIndex:
+        prevState.activeQuestionIndex === quizData.length - 1
           ? 0
-          : prevState.currentQuestionIndex + 1,
+          : prevState.activeQuestionIndex + 1,
     }));
   };
 
-  handleQuit = () => {
-    if (window.confirm('Are you sure you want to quit?')) {
-      this.handleNextQuestion();
+  confirmExit = () => {
+    if (window.confirm('Do you really want to exit the quiz?')) {
+      this.navigateToNextQuestion();
     }
   };
 
   render() {
-    const { currentQuestionIndex } = this.state;
-    const currentQuestion = questions[currentQuestionIndex];
+    const { activeQuestionIndex } = this.state;
+    const currentQuizItem = quizData[activeQuestionIndex];
 
     return (
-      <div className="App">
-        <h1>Questions</h1>
-        {currentQuestion && (
-          <>
-            <div className="question">
-              <h3>{currentQuestion.question}</h3>
-              <span>
-                {currentQuestionIndex + 1} of {questions.length}
-              </span>
-              <ul className="options">
-                <li>
-                  <button>{currentQuestion.optionA}</button>
-                </li>
-                <li>
-                  <button>{currentQuestion.optionB}</button>
-                </li>
-                <li>
-                  <button>{currentQuestion.optionC}</button>
-                </li>
-                <li>
-                  <button>{currentQuestion.optionD}</button>
-                </li>
+      <React.Fragment>
+        <h1>Quiz</h1>
+        {currentQuizItem && (
+          <React.Fragment>
+            <section className="quiz-question">
+              <h3>{currentQuizItem.questionText}</h3>
+              <p>
+                Question {activeQuestionIndex + 1} of {quizData.length}
+              </p>
+              <ul className="answer-choices">
+                {['A', 'B', 'C', 'D'].map(choice => (
+                  <li key={choice}>
+                    <button>{currentQuizItem[`option${choice}`]}</button>
+                  </li>
+                ))}
               </ul>
-            </div>
-            <div className="buttons">
-              <button className="pre" onClick={this.handlePreviousQuestion}>
-                Previous
+            </section>
+            <section className="navigation-controls">
+              <button onClick={this.navigateToPreviousQuestion}>
+                Previous Question
               </button>
-              <button className="next" onClick={this.handleNextQuestion}>
-                Next
+              <button onClick={this.navigateToNextQuestion}>
+                Next Question
               </button>
-              <button className="quit" onClick={this.handleQuit}>
-                Quit
+              <button onClick={this.confirmExit}>
+                Exit Quiz
               </button>
-            </div>
-          </>
+            </section>
+          </React.Fragment>
         )}
-      </div>
+      </React.Fragment>
     );
   }
 }
 
-export default Quiz;
+export default QuizComponent;
